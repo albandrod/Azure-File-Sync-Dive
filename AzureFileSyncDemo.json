@@ -326,7 +326,7 @@
                     "vmSize": "Standard_A2"
                 },
                 "osProfile": {
-                    "computerName": "[variables('vmName')]",
+                    "computerName": "[variables('vmNamead')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -412,7 +412,7 @@
                     "vmSize": "Standard_A2"
                 },
                 "osProfile": {
-                    "computerName": "[variables('vmName')]",
+                    "computerName": "[variables('vmName2')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -520,6 +520,7 @@
               "settings": {
                 "Name": "[parameters('domainName')]",
                 "User": "[concat(parameters('netbiosname'), '\\', parameters('adminUsername'))]",
+                "OUPath": "CN=Computers,DC=afslab,DC=com",
                 "Options": 3,
                 "Restart": "true"
               },
@@ -546,6 +547,7 @@
               "settings": {
                 "Name": "[parameters('domainName')]",
                 "User": "[concat(parameters('netbiosname'), '\\', parameters('adminUsername'))]",
+                "OUPath": "CN=Computers,DC=afslab,DC=com",
                 "Options": 3,
                 "Restart": "true"
               },
