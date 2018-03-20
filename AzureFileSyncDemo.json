@@ -28,13 +28,6 @@
               "description": "The FQDN of the Active Directory Domain to be created"
             }
         },
-        "netbiosname": {
-            "type": "string",
-            "defaultValue": "afslab",
-            "metadata": {
-              "description": "The NETBIOS of the Active Directory Domain to be created"
-            }
-        },
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
@@ -447,7 +440,31 @@
                         "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName2'))).primaryEndpoints.blob]"
                     }
                 }
-            }
+            },
+            "resources": [
+                {
+                  "type": "extensions",
+                  "name": "CustomScriptExtension",
+                  "apiVersion": "2017-03-30",
+                  "location": "[variables('Loc2')]",
+                  "dependsOn": [
+                    "[variables('vmName2')]"
+                  ],
+                  "properties": {
+                    "publisher": "Microsoft.Compute",
+                    "type": "CustomScriptExtension",
+                    "typeHandlerVersion": "1.8",
+                    "autoUpgradeMinorVersion": true,
+                    "settings": {
+                      "fileUris": [
+                        "https://ctxlabs.blob.core.windows.net/scripts/ADJoin.ps1"
+                      ],
+                      "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ADJoin.ps1 ', parameters('domainName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
+        
+                    }
+                  }
+                }
+              ]
         },
         {
             "apiVersion": "2017-03-30",
@@ -500,62 +517,32 @@
                         "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob]"
                     }
                 }
-            }
-        },
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/joindomain')]",
-            "location": "[variables('Loc')]",
-            "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]",
-              "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
-              "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
-            ],
-            "properties": {
-              "publisher": "Microsoft.Compute",
-              "type": "JsonADDomainExtension",
-              "typeHandlerVersion": "1.3",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "Name": "[parameters('domainName')]",
-                "User": "[concat(parameters('netbiosname'), '\\', parameters('adminUsername'))]",
-                "OUPath": "CN=Computers,DC=afslab,DC=com",
-                "Options": 3,
-                "Restart": "true"
-              },
-              "protectedSettings": {
-                "Password": "[parameters('adminPassword')]"
-              }
-            }
-          },
-          {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName2'),'/joindomain')]",
-            "location": "[variables('Loc2')]",
-            "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName2'))]",
-              "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
-              "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
-            ],
-            "properties": {
-              "publisher": "Microsoft.Compute",
-              "type": "JsonADDomainExtension",
-              "typeHandlerVersion": "1.3",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "Name": "[parameters('domainName')]",
-                "User": "[concat(parameters('netbiosname'), '\\', parameters('adminUsername'))]",
-                "OUPath": "CN=Computers,DC=afslab,DC=com",
-                "Options": 3,
-                "Restart": "true"
-              },
-              "protectedSettings": {
-                "Password": "[parameters('adminPassword')]"
-              }
-            }
-          }
+            },
+            "resources": [
+                {
+                  "type": "extensions",
+                  "name": "CustomScriptExtension",
+                  "apiVersion": "2017-03-30",
+                  "location": "[variables('Loc')]",
+                  "dependsOn": [
+                    "[variables('vmName')]"
+                  ],
+                  "properties": {
+                    "publisher": "Microsoft.Compute",
+                    "type": "CustomScriptExtension",
+                    "typeHandlerVersion": "1.8",
+                    "autoUpgradeMinorVersion": true,
+                    "settings": {
+                      "fileUris": [
+                        "https://ctxlabs.blob.core.windows.net/scripts/ADJoin.ps1"
+                      ],
+                      "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ADJoin.ps1 ', parameters('domainName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
+        
+                    }
+                  }
+                }
+              ]
+        }
     ],
     "outputs": {
         "hostname": {
