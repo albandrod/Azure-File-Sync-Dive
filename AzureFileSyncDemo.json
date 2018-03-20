@@ -319,7 +319,6 @@
             "location": "[variables('Loc')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicNamead'))]"
             ],
             "properties": {
