@@ -28,6 +28,13 @@
               "description": "The FQDN of the Active Directory Domain to be created"
             }
         },
+        "netbiosname": {
+            "type": "string",
+            "defaultValue": "AFSLAB",
+            "metadata": {
+              "description": "The NETBIOS of the Active Directory Domain to be created"
+            }
+        },
         "_artifactsLocation": {
             "type": "string",
             "metadata": {
@@ -48,6 +55,7 @@
         "storageAccountName2": "[concat(uniquestring(resourceGroup().id), 'uksoudiag')]",
         "nicName": "FS01nic",
         "nicName2": "FS02nic",
+        "nicName3": "WIN10nic",
         "nicNamead": "ADDCnic",
         "addressPrefix": "10.0.0.0/22",
         "addressPrefix2": "10.0.4.0/22",
@@ -56,9 +64,11 @@
         "subnetPrefix2": "10.0.4.0/24",
         "publicIPAddressName": "FS01-PIP",
         "publicIPAddressName2": "FS02-PIP",
+        "publicIPAddressName3": "WIN10-PIP",
         "publicIPAddressNamead": "ADDC-PIP",
         "vmName": "FS01",
         "vmName2": "FS02",
+        "vmName3": "WIN10",
         "vmNamead": "ADDC",
         "Loc": "canadacentral",
         "Loc2": "uksouth",
@@ -101,6 +111,18 @@
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
                     "domainNameLabel": "[concat(uniquestring(resourceGroup().id), 'fs01pip')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName3')]",
+            "location": "[variables('Loc')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(uniquestring(resourceGroup().id), 'win10pip')]"
                 }
             }
         },
@@ -243,6 +265,32 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName3')]",
+            "location": "[variables('Loc')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName3'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName3'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
@@ -535,12 +583,86 @@
                       "fileUris": [
                         "https://ctxlabs.blob.core.windows.net/scripts/ADJoin.ps1"
                       ],
-                      "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ADJoin.ps1 ', parameters('domainName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
+                      "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ADJoin.ps1 -domainName ', parameters('domainName'), ' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'))]"
                     }
                   }
                 }
               ]
-        }
+        },
+        {
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmName3')]",
+            "location": "[variables('Loc')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
+                "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]",
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_A2"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName3')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsDesktop",
+                        "offer": "Windows-10",
+                        "sku": "RS3-ProN",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName3'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName3'),'/joindomain')]",
+            "location": "[variables('Loc')]",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName3'))]",
+              "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
+              "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
+            ],
+            "properties": {
+              "publisher": "Microsoft.Compute",
+              "type": "JsonADDomainExtension",
+              "typeHandlerVersion": "1.3",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "Name": "[parameters('domainName')]",
+                "User": "[concat(parameters('netbiosname'), '\\', parameters('adminUsername'))]",
+                "OUPath": "CN=Computers,DC=afslab,DC=com",
+                "Options": 3,
+                "Restart": "true"
+              },
+              "protectedSettings": {
+                "Password": "[parameters('adminPassword')]"
+              }
+            }
+          }
     ],
     "outputs": {
         "hostname": {
