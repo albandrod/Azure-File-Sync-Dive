@@ -404,6 +404,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName2'))]",
                 "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
+                "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]",
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName2'))]"
             ],
             "properties": {
@@ -456,6 +457,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
                 "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
+                "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]",
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
             ],
             "properties": {
@@ -506,7 +508,9 @@
             "name": "[concat(variables('vmName'),'/joindomain')]",
             "location": "[variables('Loc')]",
             "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]",
+              "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
+              "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
             ],
             "properties": {
               "publisher": "Microsoft.Compute",
@@ -530,7 +534,9 @@
             "name": "[concat(variables('vmName2'),'/joindomain')]",
             "location": "[variables('Loc2')]",
             "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName2'))]"
+              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName2'))]",
+              "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
+              "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
             ],
             "properties": {
               "publisher": "Microsoft.Compute",
