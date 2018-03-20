@@ -460,7 +460,6 @@
                         "https://ctxlabs.blob.core.windows.net/scripts/ADJoin.ps1"
                       ],
                       "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ADJoin.ps1 ', parameters('domainName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
-        
                     }
                   }
                 }
@@ -537,7 +536,6 @@
                         "https://ctxlabs.blob.core.windows.net/scripts/ADJoin.ps1"
                       ],
                       "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ADJoin.ps1 ', parameters('domainName'), ' ', parameters('adminUsername'), ' ', parameters('adminPassword'))]"
-        
                     }
                   }
                 }
