@@ -36,5 +36,5 @@ tricks.
 
 -   Operate and Monitor Azure File Shares, File Sync and Azure Backups\\Restores
 
--   Some other interesting ways to interact with storage in Cloud (AZ Copy,
+-   (Bonus) Some other interesting ways to interact with storage in Cloud (AZ Copy,
     Storage Explorer, Linux FUSE Adapter)
