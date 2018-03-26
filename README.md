@@ -24,6 +24,8 @@ tricks.
 
 -   Implement Azure File Shares
 
+-   Implement JIT Access \ Storage Account Security
+
 -   Implement Azure File Sync w/ Windows File Servers(East to West)
 
 -   Understand Security \\ AD Integration models
