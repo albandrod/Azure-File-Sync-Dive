@@ -4,7 +4,7 @@ Azure File Sync<br>(1-day event)
  
 
 Looking to take advantage of the latest software technology solutions to
-distributed file servers ? How to to build out and use Azure File Sync that was
+distributed file servers ? How to build out and use Azure File Sync that was
 demoed at Ignite Oct. 2017 ?
 
 In this workshop, participants will gain in depth knowledge on Azure File Shares
