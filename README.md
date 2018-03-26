@@ -38,3 +38,5 @@ tricks.
 
 -   (Bonus) Some other interesting ways to interact with storage in Cloud (AZ Copy,
     Storage Explorer, Linux FUSE Adapter)
+
+![AFS Architecture Image](https://github.com/swiftsolves-msft/Azure-File-Sync-Dive/blob/master/images/afslabarch.png "AFS Architecture Image")
