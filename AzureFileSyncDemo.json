@@ -70,6 +70,10 @@
         "vmName2": "FS02",
         "vmName3": "WIN10",
         "vmNamead": "ADDC",
+        "networkSecurityGroups_fs01_name": "fs01-nsg",
+        "networkSecurityGroups_fs02_name": "fs02-nsg",
+        "networkSecurityGroups_addc_name": "addc-nsg",
+        "networkSecurityGroups_win10_name": "win10-nsg",
         "Loc": "canadacentral",
         "Loc2": "uksouth",
         "virtualNetworkName": "VNET-CACEN",
@@ -148,6 +152,98 @@
                 "dnsSettings": {
                     "domainNameLabel": "[concat(uniquestring(resourceGroup().id), 'fs02pip')]"
                 }
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroups_fs01_name')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-06-01",
+            "location": "[variables('Loc')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3389"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroups_fs02_name')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-06-01",
+            "location": "[variables('Loc2')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3389"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroups_addc_name')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-06-01",
+            "location": "[variables('Loc')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3389"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[variables('networkSecurityGroups_win10_name')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-06-01",
+            "location": "[variables('Loc')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "Tcp",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "3389"
+                        }
+                    }
+                ]
             }
         },
         {
@@ -254,7 +350,8 @@
             "location": "[variables('Loc')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_fs01_name'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -270,7 +367,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_fs01_name'))]"
+                }
             }
         },
         {
@@ -280,7 +380,8 @@
             "location": "[variables('Loc')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName3'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_win10_name'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -296,7 +397,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_win10_name'))]"
+                }
             }
         },
         {
@@ -306,7 +410,8 @@
             "location": "[variables('Loc')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNamead'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_addc_name'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -323,7 +428,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_addc_name'))]"
+                }
             }
         },
         {
@@ -333,7 +441,8 @@
             "location": "[variables('Loc2')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName2'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName2'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName2'))]",
+                "[concat('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_fs02_name'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -349,7 +458,10 @@
                             }
                         }
                     }
-                ]
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups/',variables('networkSecurityGroups_fs02_name'))]"
+                }
             }
         },
         {
@@ -622,32 +734,6 @@
             "location": "[variables('Loc2')]",
             "dependsOn": [
               "[concat('Microsoft.Compute/virtualMachines/', variables('vmName2'))]",
-              "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
-              "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
-            ],
-            "properties": {
-              "publisher": "Microsoft.Compute",
-              "type": "JsonADDomainExtension",
-              "typeHandlerVersion": "1.3",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "Name": "[parameters('domainName')]",
-                "User": "[concat(parameters('netbiosname'), '\\', parameters('adminUsername'))]",
-                "Options": 3,
-                "Restart": "true"
-              },
-              "protectedSettings": {
-                "Password": "[parameters('adminPassword')]"
-              }
-            }
-          },
-          {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName3'),'/joindomain')]",
-            "location": "[variables('Loc')]",
-            "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName3'))]",
               "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmNamead'))]",
               "[concat('Microsoft.Compute/virtualMachines/',variables('vmNamead'),'/extensions/','CreateADForest')]"
             ],
