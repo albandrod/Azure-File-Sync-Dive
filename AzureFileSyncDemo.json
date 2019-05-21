@@ -51,8 +51,8 @@
           }      
     },
     "variables": {
-        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'cacendiag')]",
-        "storageAccountName2": "[concat(uniquestring(resourceGroup().id), 'uksoudiag')]",
+        "storageAccountName": "[concat(uniquestring(subscription().id), 'cacendiag')]",
+        "storageAccountName2": "[concat(uniquestring(subscription().id), 'uksoudiag')]",
         "nicName": "FS01nic",
         "nicName2": "FS02nic",
         "nicName3": "WIN10nic",
